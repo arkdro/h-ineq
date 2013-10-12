@@ -8,6 +8,8 @@
   (:gen-class)
   )
 
+(def EXP-TRY 100000)
+
 ;; (trace-ns 'ineq.step)
 ;; (trace-vars ineq.step/calc-one-step)
 ;; (trace-vars ineq.step/ineq)
@@ -18,11 +20,11 @@
 ;; (untrace-vars ineq.step/calc-diff-prob)
 ;; (untrace-vars ineq.step/calc-diff-prob-aux)
 
-(defn call-calc [n cnt verbose pic]
+(defn call-calc [n verbose]
   (if verbose
     (binding [*out* *err* ineq.misc/*verbose* 'true]
-      (time (ineq.step/calc n cnt pic)))
-    (ineq.step/calc n cnt pic)))
+      (time (ineq.step/calc n)))
+    (ineq.step/calc n)))
 
 (defn print-result [res]
   (println "res: " res))
@@ -31,16 +33,14 @@
   (let [opts (cli
               args
               ["-v" "--[no-]verbose" :default false]
-              ["-p" "--[no-]picture" :default false]
-              ["-c" "--cnt" "Count of experiments"
+              ["-n" "--n" "N of experiments"
                :parse-fn #(Integer. %)
-               :default 1]
-              ["-n" "--n" "N" :parse-fn #(Integer. %)])
+               :default EXP-TRY]
+              )
         [options _ _] opts
         res (call-calc (:n options)
-                       (:cnt options)
                        (:verbose options)
-                       (:picture options))
+                       )
         ]
     (print-result res)))
 
